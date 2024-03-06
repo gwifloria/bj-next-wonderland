@@ -1,15 +1,20 @@
-'use client'
+"use client";
+import { AuthProvider } from "@/context";
+import { BlogUpload } from "./BlogUpload";
 import { useBlogData } from "./useBlogData";
-import { BlogItem } from "./BlogItem";
 
 export default function Blog() {
-    const data = useBlogData()
+  const data = useBlogData();
 
-    return (<div className="blog-container justify-between">
+  return (
+    <AuthProvider>
+      <div className="blog-container justify-between">
         <div>blog</div>
         <div className="blog-list">
-        {data?.map((blog) =>
-            <BlogItem key={blog.id} blog={blog}></BlogItem>
-        )}</div>
-    </div>)
-} 
+          <BlogUpload></BlogUpload>
+          {/* {data?.map((blog) => <BlogItem key={blog.id} blog={blog}></BlogItem>)} */}
+        </div>
+      </div>
+    </AuthProvider>
+  );
+}
