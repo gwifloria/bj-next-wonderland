@@ -1,6 +1,10 @@
-import generateMockData from "./mockdata";
+import { useSWR } from "@/api/useFetch";
+import { BlogItemIF } from "./type";
 
 export const useBlogData = () => {
-  const res = generateMockData();
-  return res.blog;
+  const { data } = useSWR<{ blogs: BlogItemIF[] }>(
+    "/floria-service/excerpt/list"
+  );
+
+  return data?.blogs;
 };

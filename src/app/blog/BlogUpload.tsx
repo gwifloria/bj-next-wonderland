@@ -4,25 +4,30 @@ import { useState } from "react";
 
 export const BlogUpload = () => {
   const [open, setOpen] = useState(false);
+  const [form] = Form.useForm();
 
-  const { data, error, isMutating, trigger } =
-    useSWRMutation("/excerpt/upload");
+  const { isMutating, trigger } = useSWRMutation(
+    "/floria-service/excerpt/upload",
+    { method: "POST" }
+  );
 
   const showModal = () => {
     setOpen(true);
   };
 
   const handleOk = (e: React.MouseEvent<HTMLElement>) => {
-    trigger();
+    form.validateFields().then(async (values) => {
+      try {
+        await trigger(values);
+        setOpen(false);
+      } catch (err) {
+        console.log(err);
+      }
+    });
   };
 
   const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
-    console.log(e);
     setOpen(false);
-  };
-
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
   };
 
   type FieldType = {
@@ -43,12 +48,12 @@ export const BlogUpload = () => {
         onCancel={handleCancel}
       >
         <Form
+          form={form}
           name="upload excerpt"
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }}
           style={{ maxWidth: 600 }}
           initialValues={{ remember: true }}
-          onFinish={onFinish}
           autoComplete="off"
         >
           <Form.Item<FieldType>

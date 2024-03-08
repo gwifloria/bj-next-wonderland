@@ -5,7 +5,7 @@ import { useWebVital } from "@/hooks/useWebVitals";
 import { AuthProvider } from "@/context";
 
 export default function Home() {
-  useWebVital();
+  // useWebVital();
 
   return (
     <StyleProvider hashPriority="high">

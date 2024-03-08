@@ -8,9 +8,6 @@ import "./index.scss";
 import { useSWRMutation } from "@/api/useFetch";
 
 export const PersonalIntroduction = () => {
-  const { data, error, isMutating, trigger } =
-    useSWRMutation("/excerpt/upload");
-
   return (
     <div className="personal-introduction__container min-h-screen py-16">
       <div className="container">

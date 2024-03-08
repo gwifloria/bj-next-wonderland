@@ -1,44 +1,67 @@
 import { useAuth } from "@/context";
-import useSWR, { SWRConfiguration } from "swr";
+import useSWR, { Fetcher, SWRConfiguration } from "swr";
 import useSWRMutation, { SWRMutationConfiguration } from "swr/mutation";
 
-export const fetcher = async (
-  url: string,
-  token: string | null,
-  options?: RequestInit
-) => {
-  const headers: { [key: string]: string } = token
-    ? { Authorization: `Bearer ${token}` }
-    : {};
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...headers,
-        ...(options?.headers || {}),
-      },
-    });
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-    return await response.json();
-  } catch (error) {
-    throw error;
-  }
-};
-
-const useCustomSWR = <T = any>(url: string, options?: SWRConfiguration) => {
+const useFetch = () => {
   const { token } = useAuth();
 
-  return useSWR<T>(url, () => fetcher(url, token), options);
+  const fetcher = async <T>(
+    url: string,
+    options?: RequestInit,
+    arg?: undefined
+  ): Promise<T> => {
+    const headers: { [key: string]: string } = token
+      ? { Authorization: `Bearer ${token}` }
+      : {};
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...headers,
+          ...(options?.headers || {}),
+        },
+        body: JSON.stringify(arg),
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return await response.json();
+    } catch (error) {
+      throw error;
+    }
+  };
+  return fetcher;
+};
+const useCustomSWR = <T>(
+  key: string,
+  fetchOptions?: RequestInit,
+  options?: SWRConfiguration
+) => {
+  const fetcher = useFetch();
+
+  return useSWR(
+    key,
+    (url: string) => {
+      fetcher<T>(url, fetchOptions);
+    },
+    options
+  );
 };
 
 const useCustomSWRMutation = <T>(
-  url: string,
-  options?: SWRMutationConfiguration<T, any, any, never, T>
+  key: string,
+  fetchOptions?: RequestInit,
+  options?: any
 ) => {
-  const { token, setToken } = useAuth();
+  const fetcher = useFetch();
 
-  return useSWRMutation<T>(url, () => fetcher(url, token), options);
+  return useSWRMutation(
+    key,
+    (url: string, { arg }: { arg: any }) => {
+      fetcher<T>(url, fetchOptions, arg);
+    },
+    options
+  );
 };
 export { useCustomSWR as useSWR, useCustomSWRMutation as useSWRMutation };

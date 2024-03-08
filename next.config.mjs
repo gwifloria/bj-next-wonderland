@@ -12,6 +12,10 @@ const nextConfig = {
         source: "/web-vital/:path*",
         destination: `http://localhost:4001/:path*`,
       },
+      {
+        source: "/floria-service/:path*",
+        destination: `http://localhost:8080/:path*`,
+      },
     ];
   },
 };
